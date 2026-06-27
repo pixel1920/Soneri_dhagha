@@ -107,7 +107,7 @@
         const grid = document.getElementById('productsGrid');
         grid.innerHTML = '';
         if(list.length === 0) {
-            grid.innerHTML = `<p style="grid-column: 1/-1; text-align:center; padding: 40px; color: #718096;">सध्या दुकानात कपडे उपलब्ध नाहीत. कृपया नंतर भेट द्या!</p>`;
+            grid.innerHTML = `<p style="grid-column: 1/-1; text-align:center; padding: 40px; color: #718096;">Currently no products are available in the shop. Please check back later!</p>`;
             return;
         }
         list.forEach(p => {
