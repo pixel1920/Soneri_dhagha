@@ -13,14 +13,22 @@
         .form-group { margin-bottom:15px; }
         label { display:block; margin-bottom:5px; font-weight:500; font-size:14px; }
         input, select { width:100%; padding:10px; border:1px solid #ddd; border-radius:6px; font-size:15px; }
-        button { width:100%; padding:12px; background:#4A0E17; color:#fff; border:none; border-radius:6px; font-weight:600; font-size:16px; cursor:pointer; margin-top:10px; }
-        button:hover { background:#631420; }
+        button { width:100%; padding:10px; background:#4A0E17; color:#fff; border:none; border-radius:6px; font-weight:600; font-size:15px; cursor:pointer; margin-top:10px; transition: 0.2s; }
+        button:hover { opacity: 0.9; }
         .hidden { display:none; }
         .product-list-item { display:flex; justify-content:space-between; align-items:center; padding:12px; border-bottom:1px solid #eee; }
-        .del-btn { background:#e53e3e; padding:5px 10px; font-size:12px; width:auto; margin:0; }
-        .del-btn:hover { background:#c53030; }
-        .shop-link-btn { background: #D4AF37; color: #4A0E17; margin-bottom: 25px; transition: opacity 0.2s; }
-        .shop-link-btn:hover { opacity: 0.9; }
+        
+        /* Action Buttons */
+        .action-btns { display: flex; gap: 8px; }
+        .edit-btn { background:#3182ce; padding:6px 12px; font-size:12px; width:auto; margin:0; }
+        .del-btn { background:#e53e3e; padding:6px 12px; font-size:12px; width:auto; margin:0; }
+        
+        .shop-link-btn { background: #D4AF37; color: #4A0E17; margin-bottom: 25px; padding: 12px; }
+        .upload-helper { background: #fffde6; border: 1px dashed #d4af37; padding: 12px; border-radius: 6px; text-align: center; margin-bottom: 15px; }
+        .upload-helper a { color: #4A0E17; font-weight: 600; text-decoration: underline; }
+        
+        /* Edit Modal Section */
+        #editSection { background: #eaf4ff; border: 1px dashed #3182ce; padding: 20px; border-radius: 8px; margin-bottom: 25px; display: none; }
     </style>
 </head>
 <body>
@@ -36,22 +44,57 @@
         <label>Passkey</label>
         <input type="password" id="passkey" placeholder="Enter Passkey">
     </div>
-    <button onclick="handleLogin()">Login to Dashboard</button>
+    <button onclick="handleLogin()" style="padding:12px;">Login to Dashboard</button>
 </div>
 
 <!-- Admin Panel Section -->
 <div class="admin-box hidden" id="adminBox">
     <h2>🛠️ Soneri Dhaga Admin Panel</h2>
     
-    <!-- Link back to the Shop -->
     <a href="shop.html" style="text-decoration: none;">
         <button class="shop-link-btn">🛒 Go To Shop</button>
     </a>
     
-    <p style="text-align:center; margin-bottom:20px; font-size:14px; color:#666;">Add new items or remove old products</p>
+    <p style="text-align:center; margin-bottom:20px; font-size:14px; color:#666;">Add, Edit or Remove products</p>
     
-    <div style="background:#fff5f6; padding:15px; border-radius:8px; margin-bottom:25px;">
-        <h3 style="font-size:16px; color:#4A0E17; margin-bottom:10px;">➕ Add New Product</h3>
+    <!-- Edit Product Section (Hidden by Default) -->
+    <div id="editSection">
+        <h3 style="font-size:16px; color:#3182ce; margin-bottom:15px;">✏️ Edit Product</h3>
+        <input type="hidden" id="eId">
+        <div class="form-group">
+            <label>Product Title</label>
+            <input type="text" id="eTitle">
+        </div>
+        <div class="form-group">
+            <label>Category</label>
+            <select id="eCategory">
+                <option value="saree">Saree Collection</option>
+                <option value="blouse">Blouse Piece</option>
+            </select>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <div class="form-group" style="flex:1;">
+                <label>Selling Price (₹)</label>
+                <input type="number" id="ePrice">
+            </div>
+            <div class="form-group" style="flex:1;">
+                <label>Original Price (₹)</label>
+                <input type="number" id="eOldPrice">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Image URL</label>
+            <input type="text" id="eImg">
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 5px;">
+            <button onclick="saveEdit()" style="background: #3182ce;">✅ Save Changes</button>
+            <button onclick="cancelEdit()" style="background: #718096;">❌ Cancel</button>
+        </div>
+    </div>
+
+    <!-- Add New Product Section -->
+    <div style="background:#fff5f6; padding:20px; border-radius:8px; margin-bottom:25px;" id="addSection">
+        <h3 style="font-size:16px; color:#4A0E17; margin-bottom:15px;">➕ Add New Product</h3>
         <div class="form-group">
             <label>Product Title</label>
             <input type="text" id="pTitle" placeholder="e.g., Paithani Silk Saree">
@@ -63,25 +106,34 @@
                 <option value="blouse">Blouse Piece</option>
             </select>
         </div>
-        <div class="form-group">
-            <label>Selling Price (₹)</label>
-            <input type="number" id="pPrice" placeholder="e.g., 2500">
+        <div style="display: flex; gap: 10px;">
+            <div class="form-group" style="flex:1;">
+                <label>Selling Price (₹)</label>
+                <input type="number" id="pPrice" placeholder="e.g., 2500">
+            </div>
+            <div class="form-group" style="flex:1;">
+                <label>Original Price (₹)</label>
+                <input type="number" id="pOldPrice" placeholder="e.g., 3500">
+            </div>
         </div>
+        
         <div class="form-group">
-            <label>Original Price (₹)</label>
-            <input type="number" id="pOldPrice" placeholder="e.g., 3500">
+            <label>Product Image</label>
+            <div class="upload-helper">
+                <p style="font-size: 13px; margin-bottom: 5px; color: #555;">📸 Upload image from your device here:</p>
+                <a href="https://imgur.com/upload" target="_blank">👉 Click Here to Upload Image 👈</a>
+                <p style="font-size: 11px; color: #777; margin-top: 5px;">(Copy the uploaded image link and paste below)</p>
+            </div>
+            <input type="text" id="pImg" placeholder="Paste the uploaded image link here">
         </div>
-        <div class="form-group">
-            <label>Image URL</label>
-            <input type="text" id="pImg" placeholder="Paste Unsplash or Google image link">
-        </div>
-        <button onclick="addProduct()">Upload Product Live 🚀</button>
+
+        <button onclick="addProduct()" style="padding:12px;">Upload Product Live 🚀</button>
     </div>
 
     <h3>📦 Active Products in Shop:</h3>
     <div id="adminProductList" style="margin-top:10px; border:1px solid #eee; border-radius:8px; background:#fff;"></div>
     
-    <button onclick="handleLogout()" style="background:#718096; margin-top:30px;">Logout</button>
+    <button onclick="handleLogout()" style="background:#718096; margin-top:30px; padding:12px;">Logout</button>
 </div>
 
 <script>
@@ -108,6 +160,7 @@
         document.getElementById('loginBox').classList.remove('hidden');
     }
 
+    // --- ADD PRODUCT ---
     function addProduct() {
         const title = document.getElementById('pTitle').value;
         const category = document.getElementById('pCategory').value;
@@ -143,6 +196,58 @@
         loadAdminProducts();
     }
 
+    // --- EDIT PRODUCT ---
+    function editProduct(id) {
+        let products = JSON.parse(localStorage.getItem('soneri_products')) || [];
+        let product = products.find(p => p.id === id);
+        
+        if(product) {
+            document.getElementById('eId').value = product.id;
+            document.getElementById('eTitle').value = product.title;
+            document.getElementById('eCategory').value = product.category;
+            document.getElementById('ePrice').value = product.price;
+            document.getElementById('eOldPrice').value = product.originalPrice;
+            document.getElementById('eImg').value = product.img || "";
+            
+            // Show Edit Section and scroll to it
+            document.getElementById('editSection').style.display = 'block';
+            window.scrollTo({ top: document.getElementById('editSection').offsetTop - 20, behavior: 'smooth' });
+        }
+    }
+
+    function cancelEdit() {
+        document.getElementById('editSection').style.display = 'none';
+    }
+
+    function saveEdit() {
+        let id = parseInt(document.getElementById('eId').value);
+        let title = document.getElementById('eTitle').value;
+        let price = document.getElementById('ePrice').value;
+
+        if(!title || !price) {
+            alert("Title and Price cannot be empty!");
+            return;
+        }
+
+        let products = JSON.parse(localStorage.getItem('soneri_products')) || [];
+        let index = products.findIndex(p => p.id === id);
+        
+        if(index !== -1) {
+            products[index].title = title;
+            products[index].category = document.getElementById('eCategory').value;
+            products[index].price = parseInt(price);
+            products[index].originalPrice = parseInt(document.getElementById('eOldPrice').value) || parseInt(price);
+            products[index].img = document.getElementById('eImg').value;
+            
+            localStorage.setItem('soneri_products', JSON.stringify(products));
+            alert("Product details updated successfully! ✅");
+            
+            cancelEdit();
+            loadAdminProducts();
+        }
+    }
+
+    // --- DELETE PRODUCT ---
     function deleteProduct(id) {
         if(confirm("Are you sure you want to remove this product from the shop?")) {
             let products = JSON.parse(localStorage.getItem('soneri_products')) || [];
@@ -152,6 +257,7 @@
         }
     }
 
+    // --- LOAD PRODUCTS ---
     function loadAdminProducts() {
         const listContainer = document.getElementById('adminProductList');
         listContainer.innerHTML = '';
@@ -170,7 +276,10 @@
                     <strong>${p.title}</strong> <span style="font-size:12px; color:#718096;">(${p.category === 'saree' ? 'Saree' : 'Blouse'})</span><br>
                     <span style="color:#4A0E17; font-weight:600;">₹${p.price}</span>
                 </div>
-                <button class="del-btn" onclick="deleteProduct(${p.id})">Delete</button>
+                <div class="action-btns">
+                    <button class="edit-btn" onclick="editProduct(${p.id})">Edit</button>
+                    <button class="del-btn" onclick="deleteProduct(${p.id})">Delete</button>
+                </div>
             `;
             listContainer.appendChild(div);
         });
