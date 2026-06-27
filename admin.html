@@ -52,14 +52,16 @@
     const ADMIN_PASS = "Neha@192006";
     let uploadedImageUrl = "";
 
+    // Cloudinary widget configuration
     var myWidget = cloudinary.createUploadWidget({
-        cloudName: 'dug3x7p4z', 
+        cloudName: 'dv4dutem2', 
         uploadPreset: 'ml_default' 
     }, (error, result) => { 
         if (!error && result && result.event === "success") { 
             uploadedImageUrl = result.info.secure_url;
             document.getElementById('uploadStatus').innerText = "✅ Image uploaded successfully!";
         } else if (error) {
+            console.error("Upload error:", error);
             alert("Upload failed: " + error.message);
         }
     });
