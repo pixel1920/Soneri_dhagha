@@ -12,14 +12,14 @@
         body { background:#f4f6f9; padding:20px; }
         .login-box, .admin-box { max-width:600px; margin:50px auto; background:#fff; padding:30px; border-radius:12px; box-shadow:0 5px 15px rgba(0,0,0,0.05); }
         .hidden { display:none; }
-        input { width:100%; padding:10px; margin:5px 0; border:1px solid #ddd; border-radius:6px; }
+        input, select { width:100%; padding:10px; margin:5px 0; border:1px solid #ddd; border-radius:6px; }
         button { width:100%; padding:12px; background:#4A0E17; color:#fff; border:none; border-radius:6px; cursor:pointer; margin-top:10px; }
         .product-list-item { display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #eee; }
+        .status-msg { font-size: 12px; color: #2b6cb0; margin-bottom: 10px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<!-- Login Section -->
 <div class="login-box" id="loginBox">
     <h2>🔒 Admin Login</h2>
     <input type="text" id="username" placeholder="Username">
@@ -27,16 +27,24 @@
     <button onclick="handleLogin()">Login</button>
 </div>
 
-<!-- Admin Panel -->
 <div class="admin-box hidden" id="adminBox">
     <h2>🛠️ Soneri Dhaga Admin</h2>
     <div style="background:#fff5f6; padding:15px; border-radius:8px;">
         <h3>➕ Add New Product</h3>
         <input type="text" id="pTitle" placeholder="Product Title">
+        
+        <!-- Category Selection -->
+        <select id="pCategory">
+            <option value="saree">Saree Collection</option>
+            <option value="blouse">Blouse Piece</option>
+        </select>
+        
         <input type="number" id="pPrice" placeholder="Price">
+        
         <!-- Direct Upload Button -->
         <button type="button" onclick="myWidget.open()" style="background:#2b6cb0;">📸 Upload Photo from Device</button>
-        <input type="text" id="pImg" placeholder="Image link will appear here" readonly>
+        <div id="uploadStatus" class="status-msg"></div>
+        
         <button onclick="addProduct()">Upload Product Live 🚀</button>
     </div>
 
@@ -46,19 +54,17 @@
 </div>
 
 <script>
-    // --- Login Credentials ---
-    const ADMIN_USER = "Neha1920"; 
-    const ADMIN_PASS = "Neha@192006";
-    // -------------------------
+    const ADMIN_USER = "ayush"; 
+    const ADMIN_PASS = "soneri99";
+    let uploadedImageUrl = "";
 
-    // Cloudinary Widget Setup
     var myWidget = cloudinary.createUploadWidget({
         cloudName: 'dug3x7p4z', 
         uploadPreset: 'ml_default'
     }, (error, result) => { 
         if (!error && result && result.event === "success") { 
-            document.getElementById('pImg').value = result.info.secure_url;
-            alert("Photo uploaded successfully!");
+            uploadedImageUrl = result.info.secure_url;
+            document.getElementById('uploadStatus').innerText = "✅ Image ready!";
         }
     });
 
@@ -74,14 +80,18 @@
 
     function addProduct() {
         const title = document.getElementById('pTitle').value;
+        const category = document.getElementById('pCategory').value;
         const price = document.getElementById('pPrice').value;
-        const img = document.getElementById('pImg').value;
-        if(!title || !img) { alert("Please fill all fields!"); return; }
+        
+        if(!title || !uploadedImageUrl) { alert("Please upload an image and fill all fields!"); return; }
         
         let products = JSON.parse(localStorage.getItem('soneri_products')) || [];
-        products.push({ id: Date.now(), title, price, img });
+        products.push({ id: Date.now(), title, category, price, img: uploadedImageUrl });
         localStorage.setItem('soneri_products', JSON.stringify(products));
+        
         alert("Product added successfully!");
+        uploadedImageUrl = ""; 
+        document.getElementById('uploadStatus').innerText = "";
         loadAdminProducts();
     }
 
@@ -90,7 +100,7 @@
         list.innerHTML = '';
         JSON.parse(localStorage.getItem('soneri_products') || '[]').forEach(p => {
             list.innerHTML += `<div class="product-list-item">
-                <span>${p.title}</span>
+                <span><strong>${p.title}</strong> (${p.category})</span>
                 <button style="width:auto; background:#e53e3e;" onclick="deleteProduct(${p.id})">Delete</button>
             </div>`;
         });
