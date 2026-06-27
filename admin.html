@@ -13,7 +13,8 @@
         .hidden { display:none; }
         input, select { width:100%; padding:10px; margin:5px 0; border:1px solid #ddd; border-radius:6px; }
         button { width:100%; padding:12px; background:#4A0E17; color:#fff; border:none; border-radius:6px; cursor:pointer; margin-top:10px; }
-        .product-list-item { display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #eee; }
+        .product-list-item { display:flex; flex-direction: column; padding:15px; border-bottom:1px solid #eee; }
+        .actions { display: flex; gap: 10px; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -27,7 +28,12 @@
 
 <div class="admin-box hidden" id="adminBox">
     <h2>🛠️ Soneri Dhaga Admin</h2>
-    <div style="background:#fff5f6; padding:15px; border-radius:8px;">
+    
+    <a href="index.html" style="text-decoration:none;">
+        <button style="background:#2f855a;">🛍️ Go to Shop</button>
+    </a>
+
+    <div style="background:#fff5f6; padding:15px; border-radius:8px; margin-top:20px;">
         <h3>➕ Add New Product</h3>
         <input type="text" id="pTitle" placeholder="Product Title">
         <select id="pCategory">
@@ -35,10 +41,8 @@
             <option value="Blouse Piece">Blouse Piece</option>
         </select>
         <input type="number" id="pPrice" placeholder="Price">
-        
-        <button type="button" onclick="myWidget.open()" style="background:#2b6cb0;">📸 Upload Photo from Device</button>
+        <button type="button" onclick="myWidget.open()" style="background:#2b6cb0;">📸 Upload Photo</button>
         <div id="uploadStatus" style="font-size: 12px; color: #2b6cb0; margin: 10px 0;"></div>
-        
         <button onclick="addProduct()">Upload Product Live 🚀</button>
     </div>
 
@@ -52,17 +56,13 @@
     const ADMIN_PASS = "Neha@192006";
     let uploadedImageUrl = "";
 
-    // Cloudinary widget configuration
     var myWidget = cloudinary.createUploadWidget({
         cloudName: 'dv4dutem2', 
         uploadPreset: 'ml_default' 
     }, (error, result) => { 
         if (!error && result && result.event === "success") { 
             uploadedImageUrl = result.info.secure_url;
-            document.getElementById('uploadStatus').innerText = "✅ Image uploaded successfully!";
-        } else if (error) {
-            console.error("Upload error:", error);
-            alert("Upload failed: " + error.message);
+            document.getElementById('uploadStatus').innerText = "✅ Image uploaded!";
         }
     });
 
@@ -78,16 +78,32 @@
         const title = document.getElementById('pTitle').value;
         const category = document.getElementById('pCategory').value;
         const price = document.getElementById('pPrice').value;
-        
-        if(!title || !uploadedImageUrl) { alert("Please upload an image and fill the title!"); return; }
+        if(!title || !uploadedImageUrl) { alert("Please fill all details!"); return; }
         
         let products = JSON.parse(localStorage.getItem('soneri_products')) || [];
         products.push({ id: Date.now(), title, category, price, img: uploadedImageUrl });
         localStorage.setItem('soneri_products', JSON.stringify(products));
-        
         alert("Product Added!");
-        uploadedImageUrl = "";
-        document.getElementById('uploadStatus').innerText = "";
+        loadAdminProducts();
+    }
+
+    function editProduct(id) {
+        let products = JSON.parse(localStorage.getItem('soneri_products'));
+        let product = products.find(p => p.id === id);
+        let newTitle = prompt("Edit Title:", product.title);
+        let newPrice = prompt("Edit Price:", product.price);
+        
+        if (newTitle && newPrice) {
+            product.title = newTitle;
+            product.price = newPrice;
+            localStorage.setItem('soneri_products', JSON.stringify(products));
+            loadAdminProducts();
+        }
+    }
+
+    function deleteProduct(id) {
+        let p = JSON.parse(localStorage.getItem('soneri_products')).filter(i => i.id !== id);
+        localStorage.setItem('soneri_products', JSON.stringify(p));
         loadAdminProducts();
     }
 
@@ -96,16 +112,13 @@
         list.innerHTML = '';
         JSON.parse(localStorage.getItem('soneri_products') || '[]').forEach(p => {
             list.innerHTML += `<div class="product-list-item">
-                <span><strong>${p.title}</strong> (${p.category})</span>
-                <button style="width:auto; background:#e53e3e;" onclick="deleteProduct(${p.id})">Delete</button>
+                <span><strong>${p.title}</strong> - ₹${p.price} (${p.category})</span>
+                <div class="actions">
+                    <button style="margin:0; background:#d69e2e;" onclick="editProduct(${p.id})">Edit</button>
+                    <button style="margin:0; background:#e53e3e;" onclick="deleteProduct(${p.id})">Delete</button>
+                </div>
             </div>`;
         });
-    }
-
-    function deleteProduct(id) {
-        let p = JSON.parse(localStorage.getItem('soneri_products')).filter(i => i.id !== id);
-        localStorage.setItem('soneri_products', JSON.stringify(p));
-        loadAdminProducts();
     }
 </script>
 </body>
