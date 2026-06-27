@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SONERI DHAGA | Premium Boutique Shop</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght=0,600;0,700;1,500&family=Poppins:wght=300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #fffcfc;
+            color: #2d3748;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* Top Luxury Navbar */
+        nav {
+            background-color: #4A0E17;
+            padding: 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 15px rgba(74, 14, 23, 0.15);
+        }
+
+        nav h1 {
+            font-family: 'Playfair Display', serif;
+            color: #D4AF37;
+            font-size: 28px;
+            letter-spacing: 3px;
+            font-weight: 700;
+        }
+
+        nav p {
+            color: #FFF0F2;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 15px;
+        }
+
+        /* Category Filter Buttons */
+        .category-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .tab-btn {
+            background-color: #fff;
+            color: #4A0E17;
+            border: 2px solid #4A0E17;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active, .tab-btn:hover {
+            background-color: #4A0E17;
+            color: #fff;
+        }
+
+        /* Product Grid Grid */
+        .products-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+
+        @media (min-width: 576px) {
+            .products-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (min-width: 992px) {
+            .products-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        /* Product Card Design */
+        .product-card {
+            background: #fff;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(74, 14, 23, 0.03);
+            border: 1px solid #f3dcd0;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-content: column;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(74, 14, 23, 0.08);
+        }
+
+        .image-placeholder {
+            width: 100%;
+            height: 320px;
+            background-color: #FCE4E6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6B1724;
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
+            font-style: italic;
+            font-weight: 600;
+            position: relative;
+        }
+
+        /* Grainy vintage overlay look indicator */
+        .image-placeholder::before {
+            content: "📸 Image";
+            opacity: 0.7;
+        }
+
+        .product-info {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .product-cat {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #718096;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .product-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            color: #4A0E17;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .product-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 15px;
+        }
+
+        .product-price span {
+            font-size: 14px;
+            text-decoration: line-through;
+            color: #a0aec0;
+            margin-left: 8px;
+            font-weight: 400;
+        }
+
+        .btn-buy {
+            width: 100%;
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.3s;
+        }
+
+        .btn-buy:hover {
+            opacity: 0.95;
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <h1>SONERI DHAGA</h1>
+    <p>Premium Saree & Blouse Boutique</p>
+</nav>
+
+<div class="container">
+    <!-- Category Selector -->
+    <div class="category-tabs">
+        <button class="tab-btn active" onclick="filterCategory('all')">All Collection</button>
+        <button class="tab-btn" onclick="filterCategory('saree')">Sarees</button>
+        <button class="tab-btn" onclick="filterCategory('blouse')">Blouse Pieces</button>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="products-grid" id="shopGrid">
+        <!-- Products will load dynamically via JS -->
+    </div>
+</div>
+
+<script>
+    // डमी डेटा (इथे तुम्ही तुमचे खरे फोटो आणि किमती टाकू शकता)
+    const products = [
+        {
+            id: 1,
+            title: "Classic Paithani Saree",
+            category: "saree",
+            price: 4500,
+            originalPrice: 5999,
+        },
+        {
+            id: 2,
+            title: "Bridal Hand-Embroidered Blouse",
+            category: "blouse",
+            price: 2200,
+            originalPrice: 2999,
+        },
+        {
+            id: 3,
+            title: "Designer Kanjeevaram Silk Saree",
+            category: "saree",
+            price: 6200,
+            originalPrice: 7500,
+        },
+        {
+            id: 4,
+            title: "Aari Work Blouse Piece",
+            category: "blouse",
+            price: 1800,
+            originalPrice: 2500,
+        },
+        {
+            id: 5,
+            title: "Premium Banarasi Silk Saree",
+            category: "saree",
+            price: 5500,
+            originalPrice: 6800,
+        },
+        {
+            id: 6,
+            title: "Heavy Zardosi Blouse Design",
+            category: "blouse",
+            price: 2500,
+            originalPrice: 3500,
+        }
+    ];
+
+    const shopGrid = document.getElementById('shopGrid');
+
+    function displayProducts(filteredList) {
+        shopGrid.innerHTML = '';
+        
+        filteredList.forEach(p => {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            
+            // व्हॉट्सॲप मेसेज तयार करण्यासाठी
+            const whatsappText = encodeURIComponent(`Hello Soneri Dhaga! I want to order this:\nProduct: ${p.title}\nPrice: ₹${p.price}`);
+            // तुमचा व्हॉट्सॲप नंबर इथे टाका (उदा. 91xxxxxxxxxx)
+            const whatsappUrl = `https://wa.me/910000000000?text=${whatsappText}`; 
+
+            card.innerHTML = `
+                <div class="image-placeholder"></div>
+                <div class="product-info">
+                    <div class="product-cat">${p.category === 'saree' ? 'Saree' : 'Blouse Piece'}</div>
+                    <div class="product-title">${p.title}</div>
+                    <div class="product-price">₹${p.price} <span>₹${p.originalPrice}</span></div>
+                    <a href="${whatsappUrl}" target="_blank" style="text-decoration: none;">
+                        <button class="btn-buy">💬 Order via WhatsApp</button>
+                    </a>
+                </div>
+            `;
+            shopGrid.appendChild(card);
+        });
+    }
+
+    function filterCategory(category) {
+        // ॲक्टिव्ह टॅबचे स्टाईल बदलणे
+        const buttons = document.querySelectorAll('.tab-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+
+        if(category === 'all') {
+            displayProducts(products);
+        } else {
+            const filtered = products.filter(p => p.category === category);
+            displayProducts(filtered);
+        }
+    }
+
+    // सुरुवातीला सर्व प्रॉडक्ट्स दाखवणे
+    displayProducts(products);
+</script>
+
+</body>
+</html>
