@@ -4,10 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SONERI DHAGA | Admin Control Panel</title>
-    <!-- Cloudinary Widget Script -->
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
         * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; }
         body { background:#f4f6f9; padding:20px; }
         .login-box, .admin-box { max-width:600px; margin:50px auto; background:#fff; padding:30px; border-radius:12px; box-shadow:0 5px 15px rgba(0,0,0,0.05); }
@@ -15,7 +14,6 @@
         input, select { width:100%; padding:10px; margin:5px 0; border:1px solid #ddd; border-radius:6px; }
         button { width:100%; padding:12px; background:#4A0E17; color:#fff; border:none; border-radius:6px; cursor:pointer; margin-top:10px; }
         .product-list-item { display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #eee; }
-        .status-msg { font-size: 12px; color: #2b6cb0; margin-bottom: 10px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -32,18 +30,14 @@
     <div style="background:#fff5f6; padding:15px; border-radius:8px;">
         <h3>➕ Add New Product</h3>
         <input type="text" id="pTitle" placeholder="Product Title">
-        
-        <!-- Category Selection -->
         <select id="pCategory">
-            <option value="saree">Saree Collection</option>
-            <option value="blouse">Blouse Piece</option>
+            <option value="Saree Collection">Saree Collection</option>
+            <option value="Blouse Piece">Blouse Piece</option>
         </select>
-        
         <input type="number" id="pPrice" placeholder="Price">
         
-        <!-- Direct Upload Button -->
         <button type="button" onclick="myWidget.open()" style="background:#2b6cb0;">📸 Upload Photo from Device</button>
-        <div id="uploadStatus" class="status-msg"></div>
+        <div id="uploadStatus" style="font-size: 12px; color: #2b6cb0; margin: 10px 0;"></div>
         
         <button onclick="addProduct()">Upload Product Live 🚀</button>
     </div>
@@ -54,28 +48,28 @@
 </div>
 
 <script>
-    const ADMIN_USER = "Neha1920"; 
-    const ADMIN_PASS = "Neha@192006";
+    const ADMIN_USER = "ayush"; 
+    const ADMIN_PASS = "soneri99";
     let uploadedImageUrl = "";
 
     var myWidget = cloudinary.createUploadWidget({
         cloudName: 'dug3x7p4z', 
-        uploadPreset: 'ml_default'
+        uploadPreset: 'ml_default' 
     }, (error, result) => { 
         if (!error && result && result.event === "success") { 
             uploadedImageUrl = result.info.secure_url;
-            document.getElementById('uploadStatus').innerText = "✅ Image ready!";
+            document.getElementById('uploadStatus').innerText = "✅ Image uploaded successfully!";
+        } else if (error) {
+            alert("Upload failed: " + error.message);
         }
     });
 
     function handleLogin() {
-        const u = document.getElementById('username').value;
-        const p = document.getElementById('passkey').value;
-        if(u === ADMIN_USER && p === ADMIN_PASS) {
+        if(document.getElementById('username').value === ADMIN_USER && document.getElementById('passkey').value === ADMIN_PASS) {
             document.getElementById('loginBox').classList.add('hidden');
             document.getElementById('adminBox').classList.remove('hidden');
             loadAdminProducts();
-        } else { alert("Wrong Login Details!"); }
+        } else { alert("Invalid Credentials!"); }
     }
 
     function addProduct() {
@@ -83,14 +77,14 @@
         const category = document.getElementById('pCategory').value;
         const price = document.getElementById('pPrice').value;
         
-        if(!title || !uploadedImageUrl) { alert("Please upload an image and fill all fields!"); return; }
+        if(!title || !uploadedImageUrl) { alert("Please upload an image and fill the title!"); return; }
         
         let products = JSON.parse(localStorage.getItem('soneri_products')) || [];
         products.push({ id: Date.now(), title, category, price, img: uploadedImageUrl });
         localStorage.setItem('soneri_products', JSON.stringify(products));
         
-        alert("Product added successfully!");
-        uploadedImageUrl = ""; 
+        alert("Product Added!");
+        uploadedImageUrl = "";
         document.getElementById('uploadStatus').innerText = "";
         loadAdminProducts();
     }
