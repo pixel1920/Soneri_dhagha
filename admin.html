@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SONERI DHAGA | Admin Control Panel</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; }
+        body { background:#f4f6f9; color:#333; padding:20px; }
+        .login-box, .admin-box { max-width:600px; margin:50px auto; background:#fff; padding:30px; border-radius:12px; box-shadow:0 5px 15px rgba(0,0,0,0.05); border-top: 5px solid #4A0E17; }
+        h2 { color:#4A0E17; margin-bottom:20px; text-align:center; }
+        .form-group { margin-bottom:15px; }
+        label { display:block; margin-bottom:5px; font-weight:500; font-size:14px; }
+        input, select { width:100%; padding:10px; border:1px solid #ddd; border-radius:6px; font-size:15px; }
+        button { width:100%; padding:12px; background:#4A0E17; color:#fff; border:none; border-radius:6px; font-weight:600; font-size:16px; cursor:pointer; margin-top:10px; }
+        button:hover { background:#631420; }
+        .hidden { display:none; }
+        .product-list-item { display:flex; justify-content:space-between; align-items:center; padding:12px; border-bottom:1px solid #eee; }
+        .del-btn { background:#e53e3e; padding:5px 10px; font-size:12px; width:auto; margin:0; }
+        .del-btn:hover { background:#c53030; }
+        .shop-link-btn { background: #D4AF37; color: #4A0E17; margin-bottom: 25px; transition: opacity 0.2s; }
+        .shop-link-btn:hover { opacity: 0.9; }
+    </style>
+</head>
+<body>
+
+<!-- Login Section -->
+<div class="login-box" id="loginBox">
+    <h2>🔒 Admin Login</h2>
+    <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="username" placeholder="Enter Username">
+    </div>
+    <div class="form-group">
+        <label>Passkey</label>
+        <input type="password" id="passkey" placeholder="Enter Passkey">
+    </div>
+    <button onclick="handleLogin()">Login to Dashboard</button>
+</div>
+
+<!-- Admin Panel Section -->
+<div class="admin-box hidden" id="adminBox">
+    <h2>🛠️ Soneri Dhaga Admin Panel</h2>
+    
+    <!-- Link back to the Shop -->
+    <a href="shop.html" style="text-decoration: none;">
+        <button class="shop-link-btn">🛒 Go To Shop (दुकान पहा)</button>
+    </a>
+    
+    <p style="text-align:center; margin-bottom:20px; font-size:14px; color:#666;">नवीन कपडे ॲड करा किंवा जुने डिलीट करा</p>
+    
+    <div style="background:#fff5f6; padding:15px; border-radius:8px; margin-bottom:25px;">
+        <h3 style="font-size:16px; color:#4A0E17; margin-bottom:10px;">➕ नवीन प्रॉडक्ट जोडा</h3>
+        <div class="form-group">
+            <label>प्रॉडक्टचे नाव (Title)</label>
+            <input type="text" id="pTitle" placeholder="उदा. काठपदर पैठणी साडी">
+        </div>
+        <div class="form-group">
+            <label>कॅटेगरी (Category)</label>
+            <select id="pCategory">
+                <option value="saree">Saree (साडी)</option>
+                <option value="blouse">Blouse Piece (ब्लाउज पीस)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>विक्री किंमत (Selling Price - ₹)</label>
+            <input type="number" id="pPrice" placeholder="उदा. 2500">
+        </div>
+        <div class="form-group">
+            <label>मूळ किंमत (Original Price - ₹)</label>
+            <input type="number" id="pOldPrice" placeholder="उदा. 3500">
+        </div>
+        <div class="form-group">
+            <label>फोटाची लिंक (Image URL)</label>
+            <input type="text" id="pImg" placeholder="गुगल किंवा अनस्प्लॅश इमेज लिंक टाका">
+        </div>
+        <button onclick="addProduct()">Upload Product Live 🚀</button>
+    </div>
+
+    <h3>📦 सध्या दुकानात असलेले प्रॉडक्ट्स:</h3>
+    <div id="adminProductList" style="margin-top:10px; border:1px solid #eee; border-radius:8px; background:#fff;"></div>
+    
+    <button onclick="handleLogout()" style="background:#718096; margin-top:30px;">Logout</button>
+</div>
+
+<script>
+    const ADMIN_USER = "ayush";
+    const ADMIN_PASS = "soneri99";
+
+    function handleLogin() {
+        const user = document.getElementById('username').value;
+        const pass = document.getElementById('passkey').value;
+
+        if(user === ADMIN_USER && pass === ADMIN_PASS) {
+            document.getElementById('loginBox').classList.add('hidden');
+            document.getElementById('adminBox').classList.remove('hidden');
+            loadAdminProducts();
+        } else {
+            alert("चुकीचा Username किंवा Passkey! पुन्हा प्रयत्न करा.");
+        }
+    }
+
+    function handleLogout() {
+        document.getElementById('username').value = '';
+        document.getElementById('passkey').value = '';
+        document.getElementById('adminBox').classList.add('hidden');
+        document.getElementById('loginBox').classList.remove('hidden');
+    }
+
+    function addProduct() {
+        const title = document.getElementById('pTitle').value;
+        const category = document.getElementById('pCategory').value;
+        const price = document.getElementById('pPrice').value;
+        const originalPrice = document.getElementById('pOldPrice').value;
+        const img = document.getElementById('pImg').value;
+
+        if(!title || !price) {
+            alert("कृपया नाव आणि विक्री किंमत नक्की टाका!");
+            return;
+        }
+
+        let products = JSON.parse(localStorage.getItem('soneri_products')) || [];
+        
+        const newProduct = {
+            id: Date.now(),
+            title: title,
+            category: category,
+            price: parseInt(price),
+            originalPrice: originalPrice ? parseInt(originalPrice) : parseInt(price),
+            img: img || "https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=400"
+        };
+
+        products.push(newProduct);
+        localStorage.setItem('soneri_products', JSON.stringify(products));
+        
+        document.getElementById('pTitle').value = '';
+        document.getElementById('pPrice').value = '';
+        document.getElementById('pOldPrice').value = '';
+        document.getElementById('pImg').value = '';
+
+        alert("प्रॉडक्ट यशस्वीरित्या दुकानात लाईव्ह झाले आहे! 🎉");
+        loadAdminProducts();
+    }
+
+    function deleteProduct(id) {
+        if(confirm("तुम्हाला नक्की हा प्रॉडक्ट दुकानातून काढून टाकायचा आहे का?")) {
+            let products = JSON.parse(localStorage.getItem('soneri_products')) || [];
+            products = products.filter(p => p.id !== id);
+            localStorage.setItem('soneri_products', JSON.stringify(products));
+            loadAdminProducts();
+        }
+    }
+
+    function loadAdminProducts() {
+        const listContainer = document.getElementById('adminProductList');
+        listContainer.innerHTML = '';
+        let products = JSON.parse(localStorage.getItem('soneri_products')) || [];
+
+        if(products.length === 0) {
+            listContainer.innerHTML = `<p style="padding:15px; text-align:center; color:#999;">दुकानात एकही प्रॉडक्ट नाही.</p>`;
+            return;
+        }
+
+        products.forEach(p => {
+            const div = document.createElement('div');
+            div.className = 'product-list-item';
+            div.innerHTML = `
+                <div>
+                    <strong>${p.title}</strong> <span style="font-size:12px; color:#718096;">(${p.category === 'saree' ? 'साडी' : 'ब्लाउज'})</span><br>
+                    <span style="color:#4A0E17; font-weight:600;">₹${p.price}</span>
+                </div>
+                <button class="del-btn" onclick="deleteProduct(${p.id})">Delete</button>
+            `;
+            listContainer.appendChild(div);
+        });
+    }
+</script>
+</body>
+</html>
